@@ -6,8 +6,4 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "Zigma" });
 });
 
-router.get("/hello", function (req, res) {
-  res.json({ Hello: "World!" });
-});
-
 module.exports = router;
