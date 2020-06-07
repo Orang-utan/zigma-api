@@ -3,8 +3,8 @@ const jwt = require("jsonwebtoken");
 const joi = require("joi");
 require("dotenv").config({ path: "../.env" });
 
-// const jwtSecret = process.env.JWT_SECRET;
-const jwtSecret = "zigmasecretkey";
+const jwtSecret = process.env.JWT_SECRET;
+// const jwtSecret = "zigmasecretkey";
 
 const Schema = mongoose.Schema;
 
