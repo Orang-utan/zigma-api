@@ -8,7 +8,7 @@ const {
 } = require("../models/users.model");
 
 const auth = require("../middleware/auth");
-const { validateEmailDomain } = require("../utils/verify");
+const { validateEmailDomain, validateCornell } = require("../utils/verify");
 
 // user signup
 router.post("/signup", async (req, res) => {
@@ -26,6 +26,10 @@ router.post("/signup", async (req, res) => {
   // check school domain
   if (!validateEmailDomain(email))
     return res.status(400).json({ error: "School is not available yet." });
+
+  // check cornell
+  if (validateCornell(email))
+    return res.status(400).json({ error: "School is too shit!" });
 
   // check registered or not?
   let user = await User.findOne({ email: email });

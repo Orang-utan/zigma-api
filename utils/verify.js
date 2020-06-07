@@ -12,6 +12,15 @@ const validateEmailDomain = (email) => {
   return false;
 };
 
+const validateCornell = (email) => {
+  const idx = email.indexOf("cornell.edu");
+  if (idx > -1) {
+    return true;
+  }
+  return false;
+};
+
 module.exports = {
   validateEmailDomain,
+  validateCornell,
 };
