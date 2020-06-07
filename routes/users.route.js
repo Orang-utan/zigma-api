@@ -23,13 +23,13 @@ router.post("/signup", async (req, res) => {
   const { error } = validateSignup(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
-  // check school domain
-  if (!validateEmailDomain(email))
-    return res.status(400).json({ error: "School is not available yet." });
-
   // check cornell
   if (validateCornell(email))
     return res.status(400).json({ error: "School is too shit!" });
+
+  // check school domain
+  if (!validateEmailDomain(email))
+    return res.status(400).json({ error: "School is not available yet." });
 
   // check registered or not?
   let user = await User.findOne({ email: email });
