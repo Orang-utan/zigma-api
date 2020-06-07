@@ -22,8 +22,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 const uri = process.env.ATLAS_URI;
-// const uri =
-//   "mongodb+srv://dtian:eBNkh3ge!@zigma-vcftp.azure.mongodb.net/zigma?retryWrites=true&w=majority";
 
 mongoose.connect(uri, {
   useNewUrlParser: true,
@@ -37,7 +35,7 @@ connection.once("open", () => {
 });
 
 app.use("/", indexRouter);
-app.use("/auth", usersRouter);
+app.use("/api/auth", usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
