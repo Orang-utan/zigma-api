@@ -8,6 +8,7 @@ const {
 } = require("../models/users.model");
 
 const auth = require("../middleware/auth");
+const { validateEmailDomain } = require("../utils/verify");
 
 // user signup
 router.post("/signup", async (req, res) => {
@@ -21,6 +22,10 @@ router.post("/signup", async (req, res) => {
   // validate data
   const { error } = validateSignup(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
+
+  // check school domain
+  if (!validateEmailDomain(email))
+    return res.status(400).json({ error: "School is not available yet." });
 
   // check registered or not?
   let user = await User.findOne({ email: email });
@@ -52,14 +57,14 @@ router.post("/login", async (req, res) => {
   const { error } = validateLogin(req.body);
   if (error) return res.status(400).json({ error: error.details[0].message });
 
-  let user = await User.findOne({ email: email });
+  const user = await User.findOne({ email: email });
   if (!user) {
     return res
       .status(400)
       .json({ error: "Either email or password is incorrect" });
   }
 
-  const valid = bcrypt.compare(password, user.password);
+  const valid = await bcrypt.compare(password, user.password);
   if (!valid) {
     return res
       .status(400)
@@ -69,15 +74,20 @@ router.post("/login", async (req, res) => {
   // generate token here
   const accessToken = user.generateAccessToken(user._id);
 
-  user = await User.findOne({ email: email }).select("-password");
-
-  res.json({ accessToken: accessToken, user: user });
+  return res.json({ accessToken: accessToken, user: user });
 });
 
 // who am i
 router.get("/me", auth, async (req, res) => {
   const user = await User.findById({ _id: req.userId }).select("-password");
   res.json({ user: user });
+});
+
+// user login
+router.post("/reset-password", async (req, res) => {
+  const email = req.body.email;
+
+  res.json({ message: "Email Sent!" });
 });
 
 module.exports = router;
