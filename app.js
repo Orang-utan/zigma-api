@@ -21,7 +21,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-const uri = process.env.ATLAS_URI;
+// const uri = process.env.ATLAS_URI;
+const uri =
+  "mongodb+srv://dtian:eBNkh3ge!@zigma-vcftp.azure.mongodb.net/zigma?retryWrites=true&w=majority";
+
 mongoose.connect(uri, {
   useNewUrlParser: true,
   useCreateIndex: true,
