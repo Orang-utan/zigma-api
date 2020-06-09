@@ -48,7 +48,11 @@ router.get("/:id", async (req, res) => {
 
   Room.findById({ _id: roomId })
     .then((room) => {
-      res.status(200).json({ room: room });
+      if (room) {
+        return res.status(200).json({ room: room });
+      } else {
+        return res.status(400).json({ error: "Room does not exist" });
+      }
     })
     .catch((err) => {
       res.status(400).json({ error: err });
@@ -56,14 +60,40 @@ router.get("/:id", async (req, res) => {
 });
 
 // leave room
-router.get("/leave", async (req, res) => {
+router.post("/leave", async (req, res) => {
   const userId = req.body.userId;
   const roomId = req.body.roomId;
 
   const targetRoom = await Room.findById({ _id: roomId });
 
-  targetRoom.peerIds.filter((val) => {
-    val != userId;
-  });
+  // check if user id exist in the room
+  if (!targetRoom.peerIds.includes(userId)) {
+    return res.status(400).json({ error: "User Id is not in room!" });
+  }
+
+  const resultIds = targetRoom.peerIds.filter((val) => val != userId);
+  targetRoom.peerIds = resultIds;
+
+  // check if there's no one in the room, if true, delete room
+  if (targetRoom.peerIds.length < 1) {
+    Room.findByIdAndDelete({ _id: roomId })
+      .then(() => {
+        return res
+          .status(200)
+          .json({ message: "Room is empty and thus deleted." });
+      })
+      .catch((err) => {
+        return res.status(400).json({ error: err });
+      });
+  }
+
+  targetRoom
+    .save()
+    .then(() => {
+      res.status(200).json({ message: "Leave room succesfully" });
+    })
+    .catch((err) => {
+      res.status(400).json({ error: err });
+    });
 });
 module.exports = router;
