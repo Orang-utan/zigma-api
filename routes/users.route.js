@@ -25,7 +25,9 @@ router.post("/signup", async (req, res) => {
 
   // check cornell
   if (validateCornell(email))
-    return res.status(400).json({ error: "School is too shit!" });
+    return res
+      .status(400)
+      .json({ error: "Please transfer to a real Ivy League." });
 
   // check school domain
   if (!validateEmailDomain(email))
@@ -87,7 +89,12 @@ router.get("/me", auth, async (req, res) => {
   res.json({ user: user });
 });
 
-// user login
+// TODO: send verification email route
+
+// TODO: verify email
+
+// reset password
+// input: user email
 router.post("/reset-password", async (req, res) => {
   const email = req.body.email;
 
