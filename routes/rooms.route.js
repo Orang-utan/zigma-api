@@ -55,5 +55,9 @@ router.get("/:id", async (req, res) => {
     });
 });
 
-router.get("/leave", async (req, res) => {});
+// leave room
+router.get("/leave", async (req, res) => {
+  const userId = req.body.userId;
+  const roomId = req.body.roomId;
+});
 module.exports = router;
