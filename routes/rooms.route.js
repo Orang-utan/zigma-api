@@ -3,7 +3,7 @@ var router = express.Router();
 
 const { Room } = require("../models/rooms.model");
 
-router.get("/join", async (req, res) => {
+router.post("/join", async (req, res) => {
   const category = req.body.category;
   const userId = req.body.userId;
 
@@ -59,5 +59,11 @@ router.get("/:id", async (req, res) => {
 router.get("/leave", async (req, res) => {
   const userId = req.body.userId;
   const roomId = req.body.roomId;
+
+  const targetRoom = await Room.findById({ _id: roomId });
+
+  targetRoom.peerIds.filter((val) => {
+    val != userId;
+  });
 });
 module.exports = router;
