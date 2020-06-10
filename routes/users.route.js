@@ -51,6 +51,8 @@ router.post("/signup", async (req, res) => {
 
   await newUser.save();
 
+  // TODO: send verification email here
+
   res.status(200).json({ message: "User created" });
 });
 
@@ -89,9 +91,21 @@ router.get("/me", auth, async (req, res) => {
   res.json({ user: user });
 });
 
-// TODO: send verification email route
+// get user based on id
+router.get("/:id", async (req, res) => {
+  const userId = req.params.id;
+  const user = await User.findById({ _id: userId }).select("-password");
+  res.json({ user: user });
+});
 
 // TODO: verify email
+router.get("/verify-email/:id", async (req, res) => {
+  const verificationCode = req.params.id;
+
+  // check if verification code matches users
+
+  res.json({ message: "User verified!" });
+});
 
 // reset password
 // input: user email

@@ -3,6 +3,7 @@ var router = express.Router();
 
 const { Room } = require("../models/rooms.model");
 
+// join room
 router.post("/join", async (req, res) => {
   const category = req.body.category;
   const userId = req.body.userId;
