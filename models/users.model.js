@@ -3,7 +3,8 @@ const jwt = require("jsonwebtoken");
 const joi = require("joi");
 require("dotenv").config({ path: "../.env" });
 
-const jwtSecret = process.env.JWT_SECRET;
+const access_token_secret = process.env.ACCESS_TOKEN_SECRET;
+const refresh_token_secret = process.env.REFRESH_TOKEN_SECRET;
 
 const Schema = mongoose.Schema;
 
@@ -47,6 +48,14 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    profileImageUrl: {
+      type: String,
+    },
+    tokenVersion: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
   },
   {
     timestamps: true, //when model is created
@@ -55,7 +64,17 @@ const UserSchema = new Schema(
 
 UserSchema.methods.generateAccessToken = (userId) => {
   const payload = { userId: userId };
-  const token = jwt.sign(payload, jwtSecret);
+  const token = jwt.sign(payload, access_token_secret, {
+    expiresIn: "15m",
+  });
+  return token;
+};
+
+UserSchema.methods.generateRefreshToken = (userId, tokenVersion) => {
+  const payload = { userId: userId, tokenVersion: tokenVersion };
+  const token = jwt.sign(payload, refresh_token_secret, {
+    expiresIn: "7d",
+  });
   return token;
 };
 
@@ -69,6 +88,7 @@ const validateSignup = (user) => {
     password: joi.string().min(6).max(255).required(),
     school: joi.string().min(1).max(255).required(),
     wechatId: joi.string().min(1).max(255).required(),
+    profileImageUrl: joi.string(),
   };
 
   return joi.validate(user, schema);

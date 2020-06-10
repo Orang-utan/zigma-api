@@ -81,8 +81,13 @@ router.post("/login", async (req, res) => {
 
   // generate token here
   const accessToken = user.generateAccessToken(user._id);
+  const refreshToken = user.generateRefreshToken(user.tokenVersion);
 
-  return res.json({ accessToken: accessToken, user: user });
+  return res.json({
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+    user: user,
+  });
 });
 
 // who am i
