@@ -10,22 +10,22 @@ router.post("/join", async (req, res) => {
   const category = req.body.category;
   const userId = req.body.userId;
 
-  // check whether party has started or not
-  const { monthNow, dateNow, hourNow } = getBreakDownTime(getBeijingTime());
-  if (0 <= hourNow && hourNow < 21) {
-    return res.status(400).json({ error: "Party has not started yet." });
-  } else {
-    // if party has started, check if user is in the queue
-    const todayDate = `${monthNow}/${dateNow}`;
-    const targetQueue = await Queue.findOne({ date: todayDate });
+  // // check whether party has started or not
+  // const { monthNow, dateNow, hourNow } = getBreakDownTime(getBeijingTime());
+  // if (0 <= hourNow && hourNow < 21) {
+  //   return res.status(400).json({ error: "Party has not started yet." });
+  // } else {
+  //   // if party has started, check if user is in the queue
+  //   const todayDate = `${monthNow}/${dateNow}`;
+  //   const targetQueue = await Queue.findOne({ date: todayDate });
 
-    // if not in queue, does not allow user to enter
-    if (!targetQueue.userIds.includes(userId)) {
-      return res
-        .status(400)
-        .json({ error: "Sorry. You have not registered for today's party." });
-    }
-  }
+  //   // if not in queue, does not allow user to enter
+  //   if (!targetQueue.userIds.includes(userId)) {
+  //     return res
+  //       .status(400)
+  //       .json({ error: "Sorry. You have not registered for today's party." });
+  //   }
+  // }
 
   // search for existing rooms that match category
   const allRooms = await Room.find();
