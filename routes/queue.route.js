@@ -8,9 +8,7 @@ const auth = require("../middleware/auth");
 
 router.post("/join", async (req, res) => {
   const userId = req.body.userId;
-  const { monthNow, dateNow, hourNow, minuteNow } = getBreakDownTime(
-    getBeijingTime()
-  );
+  const { monthNow, dateNow, hourNow } = getBreakDownTime(getBeijingTime());
 
   if (0 <= hourNow && hourNow < 21) {
     // from 00:00 ~ 20:59
