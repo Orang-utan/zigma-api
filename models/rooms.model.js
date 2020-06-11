@@ -12,6 +12,22 @@ const RoomSchema = new Schema(
       type: [String],
       required: true,
     },
+    prompts: {
+      type: [
+        {
+          prompt: {
+            type: String,
+            required: true,
+          },
+          createdAt: {
+            type: Date,
+            default: Date.now,
+          },
+        },
+      ],
+      required: true,
+      default: [],
+    },
   },
   {
     timestamps: true, //when model is created

@@ -50,6 +50,7 @@ const UserSchema = new Schema(
     },
     profileImageUrl: {
       type: String,
+      default: "https://zigma.blob.core.windows.net/images/anon.png",
     },
     tokenVersion: {
       type: Number,

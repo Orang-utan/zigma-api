@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const { getBeijingTime, getBreakDownTime } = require("../utils/date");
+const { getRandomPrompt } = require("../utils/prompts");
 const { TESTING } = require("../config");
 
 const { Room } = require("../models/rooms.model");
@@ -44,10 +45,10 @@ router.get("/delete-all", (req, res) => {
 router.post("/join", async (req, res) => {
   const category = req.body.category;
   const userId = req.body.userId;
-
+  const { monthNow, dateNow, hourNow } = getBreakDownTime(getBeijingTime());
   if (!TESTING) {
     // check whether party has started or not
-    const { monthNow, dateNow, hourNow } = getBreakDownTime(getBeijingTime());
+
     if (0 <= hourNow && hourNow < 21) {
       return res.status(400).json({ error: "Party has not started yet." });
     } else {
@@ -67,9 +68,34 @@ router.post("/join", async (req, res) => {
   // search for existing rooms that match category
   const allRooms = await Room.find();
 
+  // remove user id from all other rooms today
+  for (let i = 0; i < allRooms.length; i++) {
+    const roomMonth = allRooms[i].createdAt.getMonth() + 1;
+    const roomDate = allRooms[i].createdAt.getDate();
+
+    if (
+      allRooms[i].peerIds.includes(userId) &&
+      roomMonth == monthNow &&
+      roomDate == dateNow
+    ) {
+      const resultIds = allRooms[i].peerIds.filter((val) => val != userId);
+      allRooms[i].peerIds = resultIds;
+      await allRooms[i].save();
+    }
+  }
+
+  // find a room that has less than 5 members, and is the desired category
   let targetRoom = null;
-  allRooms.forEach((val, idx) => {
-    if (val.peerIds.length < 4 && val.category === category) {
+  allRooms.forEach((val) => {
+    const roomMonth = val.createdAt.getMonth() + 1;
+    const roomDate = val.createdAt.getDate();
+
+    if (
+      val.peerIds.length < 4 &&
+      val.category === category &&
+      roomMonth == monthNow &&
+      roomDate == dateNow
+    ) {
       targetRoom = val;
       return;
     }
@@ -91,6 +117,11 @@ router.post("/join", async (req, res) => {
     const newRoom = new Room({
       category,
       peerIds: [userId],
+      prompts: [
+        {
+          prompt: getRandomPrompt(),
+        },
+      ],
     });
 
     await newRoom.save();
@@ -122,6 +153,11 @@ router.post("/leave", async (req, res) => {
   const roomId = req.body.roomId;
 
   const targetRoom = await Room.findById({ _id: roomId });
+
+  // check if room exists
+  if (!targetRoom) {
+    return res.status(400).json({ error: "Room does not exist." });
+  }
 
   // check if user id exist in the room
   if (!targetRoom.peerIds.includes(userId)) {

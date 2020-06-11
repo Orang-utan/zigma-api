@@ -1,5 +1,3 @@
-const { get } = require("mongoose");
-
 const promptList = [
   "What do you think about the weather?",
   "What's your favorite food?",
