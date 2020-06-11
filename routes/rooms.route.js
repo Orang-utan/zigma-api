@@ -5,6 +5,17 @@ const { getBeijingTime, getBreakDownTime } = require("../utils/date");
 const { Room } = require("../models/rooms.model");
 const { Queue } = require("../models/queue.model");
 
+// delete all rooms (for testing only)
+router.get("/delete-all", (req, res) => {
+  Room.deleteMany({}, (err) => {
+    if (err) {
+      return res.status(500).json({ error: err });
+    } else {
+      return res.status(200).json({ message: "All rooms are deleted!" });
+    }
+  });
+});
+
 // join room
 router.post("/join", async (req, res) => {
   const category = req.body.category;
