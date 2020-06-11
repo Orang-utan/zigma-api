@@ -1,5 +1,5 @@
 // valid school list
-const validEmailList = ["yale.edu", "upenn.edu"];
+const { validEmailList } = require("../config");
 
 const validateEmailDomain = (email) => {
   for (i = 0; i < validEmailList.length; i++) {
