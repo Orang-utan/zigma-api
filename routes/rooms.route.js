@@ -6,6 +6,23 @@ const { TESTING } = require("../config");
 const { Room } = require("../models/rooms.model");
 const { Queue } = require("../models/queue.model");
 
+// get all rooms (for testing only)
+router.get("/", (req, res) => {
+  if (!TESTING) {
+    return res
+      .status(400)
+      .json({ error: "Illegal operation. Ony valid during testing." });
+  }
+
+  Room.find({}, (err, rooms) => {
+    if (err) {
+      return res.status(500).json({ error: err });
+    } else {
+      return res.status(200).json({ rooms: rooms });
+    }
+  });
+});
+
 // delete all rooms (for testing only)
 router.get("/delete-all", (req, res) => {
   if (!TESTING) {
