@@ -1,12 +1,19 @@
 var express = require("express");
 var router = express.Router();
 const { getBeijingTime, getBreakDownTime } = require("../utils/date");
+const { TESTING } = require("../config");
 
 const { Room } = require("../models/rooms.model");
 const { Queue } = require("../models/queue.model");
 
 // delete all rooms (for testing only)
 router.get("/delete-all", (req, res) => {
+  if (!TESTING) {
+    return res
+      .status(400)
+      .json({ error: "Illegal operation. Ony valid during testing." });
+  }
+
   Room.deleteMany({}, (err) => {
     if (err) {
       return res.status(500).json({ error: err });
@@ -21,20 +28,22 @@ router.post("/join", async (req, res) => {
   const category = req.body.category;
   const userId = req.body.userId;
 
-  // check whether party has started or not
-  const { monthNow, dateNow, hourNow } = getBreakDownTime(getBeijingTime());
-  if (0 <= hourNow && hourNow < 21) {
-    return res.status(400).json({ error: "Party has not started yet." });
-  } else {
-    // if party has started, check if user is in the queue
-    const todayDate = `${monthNow}/${dateNow}`;
-    const targetQueue = await Queue.findOne({ date: todayDate });
+  if (!TESTING) {
+    // check whether party has started or not
+    const { monthNow, dateNow, hourNow } = getBreakDownTime(getBeijingTime());
+    if (0 <= hourNow && hourNow < 21) {
+      return res.status(400).json({ error: "Party has not started yet." });
+    } else {
+      // if party has started, check if user is in the queue
+      const todayDate = `${monthNow}/${dateNow}`;
+      const targetQueue = await Queue.findOne({ date: todayDate });
 
-    // if not in queue, does not allow user to enter
-    if (!targetQueue.userIds.includes(userId)) {
-      return res
-        .status(400)
-        .json({ error: "Sorry. You have not registered for today's party." });
+      // if not in queue, does not allow user to enter
+      if (!targetQueue.userIds.includes(userId)) {
+        return res
+          .status(400)
+          .json({ error: "Sorry. You have not registered for today's party." });
+      }
     }
   }
 
